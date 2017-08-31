@@ -1,0 +1,115 @@
+var img = new Image();
+var square = new Image();
+var canvas = document.getElementById('canvas'), context = canvas.getContext('2d');
+
+// User Variables - customize these to change the image being scrolled, its
+// direction, and the speed.
+
+img.src = 'https://mdn.mozillademos.org/files/4553/Capitan_Meadows,_Yosemite_National_Park.jpg';
+square.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Grey_Square.svg/2000px-Grey_Square.svg.png';
+var CanvasXSize;
+var CanvasYSize;
+var speed = 10; // lower is faster
+var scale = 1.05;
+var yOffset = 0; // vertical offset
+
+// Main program
+
+var dx = 0.5;
+var imgW;
+var imgH;
+var xPos = 0;
+var clearX;
+var clearY;
+var ctx;
+
+(function() {
+
+    // resize the canvas to fill browser window dynamically
+    window.addEventListener('resize', resizeCanvas, false);
+    function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight / 3;
+            CanvasXSize = canvas.width;
+            CanvasYSize = //(window.innerHeight) < 800 ? 300 : canvas.height;
+                canvas.height;
+            drawStuff(); 
+    }
+    resizeCanvas();
+
+    var canv = document.getElementById('canvas');
+    canv.addEventListener('mouseover',hoverCanvas, false);
+    function hoverCanvas() {
+        dx = 0;
+    }
+    canv.addEventListener('mouseout',leaveCanvas, false);
+    function leaveCanvas() {
+        //dx = 0.5;
+    }
+    canv.addEventListener('mousedown',jumpX,false);
+    function jumpX() {
+        debugger;
+        //xPos += 10;
+        //dx = 0.5;
+    }
+
+    /**
+     * Your drawings need to be inside this function otherwise they will be reset when 
+     * you resize the browser window and the canvas goes will be cleared.
+     */
+
+    img.onload = function() {
+        imgW = img.width * scale;
+        imgH = img.height * scale;
+        
+        if (imgW > CanvasXSize) { xPos = CanvasXSize - imgW; } // image larger than canvas
+        if (imgW > CanvasXSize) { clearX = imgW; } // image width larger than canvas
+        else { clearX = CanvasXSize; }
+        if (imgH > CanvasYSize) { clearY = imgH; } // image height larger than canvas
+        else { clearY = CanvasYSize; }
+        
+        // get canvas context
+        ctx = document.getElementById('canvas').getContext('2d');
+     
+        // set refresh rate
+        return setInterval(drawStuff, speed);
+    }
+
+    function drawStuff() {
+        ctx = document.getElementById('canvas').getContext('2d');
+        ctx.clearRect(0, 0, clearX, clearY); // clear the canvas
+        
+
+        // if image is <= Canvas Size
+        if (imgW <= CanvasXSize) {
+            debugger;
+            // reset, start from beginning
+            if (xPos > CanvasXSize) { xPos = -imgW + xPos; }
+            // draw additional image1
+            if (xPos > 0) { 
+                ctx.drawImage(img, -imgW + xPos, yOffset, imgW, imgH); 
+                var loopXPos = xPos;
+                while ((loopXPos + imgW) < CanvasXSize) {
+                    debugger;
+                    ctx.drawImage(img, loopXPos, yOffset, imgW, imgH); 
+                    loopXPos += imgW;
+                }
+            }
+            // draw additional image2
+            if (xPos - imgW > 0) { ctx.drawImage(img, -imgW * 2 + xPos, yOffset, imgW, imgH); }
+        }
+
+        // if image is > Canvas Size
+        else {
+            // reset, start from beginning
+            if (xPos > (CanvasXSize)) { xPos = CanvasXSize - imgW; }
+            // draw aditional image
+            if (xPos > (CanvasXSize-imgW)) { ctx.drawImage(img, xPos - imgW + 1, yOffset, imgW, imgH); }
+        }
+
+        // draw image
+        ctx.drawImage(img, xPos, yOffset, imgW, imgH);        
+        // amount to move
+        xPos += dx;
+    }
+})();
