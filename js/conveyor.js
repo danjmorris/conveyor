@@ -53,30 +53,27 @@ var ctx;
         this.yPos = yPos;
         this.width = width;
         this.height = height;
-        this.visibility = false;
+        this.right = function () {
+            return xPos + width;
+        };
+        this.bottom = function () {
+            return yPos + height;
+        }
     }
 
-    function initImages() {
+    $(document).ready(function() {
         var xPos = 10;
         for (i = 0; i < imageUrls.length; i++) { 
             var luggageItem = new Image();
             luggageItem.onload = function () {
-                /*if (luggageItem.width > 0) {
-                    luggagePositions[i].width = luggageItem.width;
-                    luggagePositions[i].height = luggageItem.height;
-                }
-                luggagePositions.push(new ImagePosition(i, xPos, 20, luggageItem.width, luggageItem.height));*/
+                //luggagePositions.push(new ImagePosition(i, xPos, 20, luggageItem.width, luggageItem.height));
             }
             luggageItem.src = imageUrls[i];
             var luggagePos = new ImagePosition(i, xPos, 20, IMG_WIDTH, IMG_HEIGHT);
             luggagePositions.push(luggagePos);
             luggageItems.push(luggageItem);
-            xPos += luggageItem.width -18; 
+            xPos += IMG_WIDTH -18; 
         }
-    }
-
-    $(document).ready(function() {
-        //initImages();
     });
 
     function getMousePos(canvas, evt) {
@@ -90,14 +87,14 @@ var ctx;
     // resize the canvas to fill browser window dynamically
     window.addEventListener('resize', resizeCanvas, false);
     function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight / 3;
-        clearX = canvas.width;
-        clearY = canvas.height;
-        CanvasXSize = canvas.width;
-        CanvasYSize = //(window.innerHeight) < 800 ? 300 : canvas.height;
-            canvas.height;
-        drawStuff(); 
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight / 3;
+            clearX = canvas.width;
+            clearY = canvas.height;
+            CanvasXSize = canvas.width;
+            CanvasYSize = //(window.innerHeight) < 800 ? 300 : canvas.height;
+                canvas.height;
+            drawStuff(); 
     }
     resizeCanvas();
 
@@ -140,8 +137,6 @@ var ctx;
      */
 
     conveyor.onload = function() {
-        initImages();
-
         imgW = conveyor.width * scale;
         imgH = conveyor.height * scale;
         
@@ -153,13 +148,16 @@ var ctx;
         
         // get canvas context
         ctx = document.getElementById('canvas').getContext('2d');
+     
+        // set refresh rate
+        return setInterval(drawStuff, speed);
     }
 
     function drawStuff() {
         ctx = document.getElementById('canvas').getContext('2d');
         ctx.clearRect(0, 0, clearX, clearY); // clear the canvas
 
-        // Check whether luggage has overlapped screen edge
+        // Check whether image has overlapped screen edge
         for (i = 0; i < luggagePositions.length; i++) {
             var luggagePosition = luggagePositions[i];
             if (luggagePosition.xPos > CanvasXSize + luggagePosition.width) {
@@ -203,7 +201,8 @@ var ctx;
         // draw items
         for (i = 0; i < luggagePositions.length; i++) {
             var luggagePosition = luggagePositions[i];
-            ctx.drawImage(luggageItems[i],luggagePosition.xPos, luggagePosition.yPos, luggageItems[i].width, luggageItems[i].height);
+            //ctx.drawImage(luggageItems[i],luggagePosition.xPos, luggagePosition.yPos, luggageItems[i].width, luggageItems[i].height);
+            ctx.drawImage(luggageItems[i],luggagePosition.xPos, luggagePosition.yPos, IMG_WIDTH, IMG_HEIGHT);
             luggagePositions[i].xPos += dx; 
         }
         // amount to move
